@@ -1,65 +1,79 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../i18n/strings.dart';
 import '../models/check_in.dart';
 import '../models/hawkins.dart';
 import '../state/app_state.dart';
 import '../theme/app_theme.dart';
 import '../widgets/lang_toggle.dart';
+import '../widgets/paper_background.dart';
 
 class _Day {
-  final int day;
-  final int score;
+  final int dayOfMonth;
+  final int score; // 0 = no check-in that day
   final bool isToday;
-  const _Day(this.day, this.score, this.isToday);
+  const _Day(this.dayOfMonth, this.score, this.isToday);
 }
 
-/// 21-day grid — seeded demo data so the visualization stays stable.
-final List<_Day> _journeyDays = _buildDays();
+const _monthNamesEn = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+const _monthNamesVi = [
+  'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+  'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12',
+];
 
-List<_Day> _buildDays() {
-  final rnd = Random(7);
-  return List.generate(21, (i) {
-    if (i == 20) return const _Day(21, 0, true); // today
-    int score;
-    if (i >= 14) {
-      score = mockEnergyHistory[i - 14].score; // last week of history
-    } else {
-      score = rnd.nextInt(500) + 80;
-    }
-    return _Day(i + 1, score, false);
-  });
+/// Every real day of the current calendar month, scored from the user's
+/// actual check-ins (not demo data) so the grid reflects genuine consistency.
+/// Returns null for leading blank cells before day 1 (for weekday alignment).
+List<_Day?> _buildMonthDays(AppState app) {
+  final today = DateTime.now();
+  final firstOfMonth = DateTime(today.year, today.month, 1);
+  final daysInMonth = DateTime(today.year, today.month + 1, 0).day;
+  final leadingBlanks = firstOfMonth.weekday - 1; // Monday = 1 -> 0 blanks
+
+  return [
+    ...List.filled(leadingBlanks, null),
+    ...List.generate(daysInMonth, (i) {
+      final day = i + 1;
+      final d = DateTime(today.year, today.month, day);
+      final checkIns = app.checkInsOn(dateKey(d));
+      final score = checkIns.isEmpty ? 0 : getDailyEnergy(checkIns);
+      return _Day(day, score, day == today.day);
+    }),
+  ];
 }
-
-final int _completedDays =
-    _journeyDays.where((d) => d.score > 0 && !d.isToday).length;
-const int _streak = 7;
 
 class JourneyScreen extends StatelessWidget {
   const JourneyScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final s = context.watch<AppState>().s;
-    final progress = _completedDays / 21;
+    final app = context.watch<AppState>();
+    final s = app.s;
+    final vi = s.lang == Lang.vi;
+    final monthDays = _buildMonthDays(app);
+    final today = DateTime.now();
+    final monthLabel =
+        '${vi ? _monthNamesVi[today.month - 1] : _monthNamesEn[today.month - 1]}, ${today.year}';
+    final weekdayHeaders =
+        vi ? ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'] : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    final streak = app.currentStreak;
+    final longestStreak = app.longestStreak;
+    final totalCheckIns = app.checkIns.length;
+    final progress = (streak / 21).clamp(0.0, 1.0);
 
     final milestones = [
-      [7, s.journeyFirstWeek, '🌱'],
-      [14, s.journeyTwoWeeks, '🌿'],
-      [21, s.journeyTwentyOne, '✨'],
+      [7, s.journeyFirstWeek, Icons.eco_rounded],
+      [14, s.journeyTwoWeeks, Icons.spa_rounded],
+      [21, s.journeyTwentyOne, Icons.auto_awesome_rounded],
     ];
 
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFFF5EFE0), AppColors.canvas],
-          stops: [0, 0.45],
-        ),
-      ),
+    return PaperBackground(
+      tint: const Color(0xFFF5EFE0),
+      blob: AppColors.goldLight,
       child: SafeArea(
         bottom: false,
         child: ListView(
@@ -96,7 +110,7 @@ class JourneyScreen extends StatelessWidget {
                     child: _statTile(
                       icon: Icons.local_fire_department,
                       gradient: const [Color(0xFFF5C4A0), Color(0xFFE0A870)],
-                      value: '$_streak',
+                      value: '$streak',
                       label: s.journeyDayStreak,
                     ),
                   ),
@@ -105,7 +119,7 @@ class JourneyScreen extends StatelessWidget {
                     child: _statTile(
                       icon: Icons.star,
                       gradient: const [AppColors.lavender2, AppColors.lavender],
-                      value: '$_completedDays/21',
+                      value: '$totalCheckIns',
                       label: s.journeyCheckins,
                     ),
                   ),
@@ -133,7 +147,7 @@ class JourneyScreen extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: progress,
                       minHeight: 10,
-                      backgroundColor: const Color(0xFFC8C3DC).withOpacity(0.2),
+                      backgroundColor: const Color(0xFFDCCDB8).withOpacity(0.2),
                       valueColor: const AlwaysStoppedAnimation(Color(0xFFE0A870)),
                     ),
                   ),
@@ -142,26 +156,39 @@ class JourneyScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // 21-day grid
+            // Month calendar grid
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.8),
+                color: AppColors.paper.withOpacity(0.8),
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(s.journeyYour21, style: AppText.sans(size: 13, color: AppColors.muted)),
+                  Text(monthLabel, style: AppText.sans(size: 13, color: AppColors.muted)),
                   const SizedBox(height: 12),
+                  Row(
+                    children: weekdayHeaders
+                        .map((h) => Expanded(
+                              child: Center(
+                                child: Text(h,
+                                    style: AppText.sans(
+                                        size: 10, weight: FontWeight.w600, color: AppColors.muted2)),
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                  const SizedBox(height: 8),
                   GridView.count(
                     crossAxisCount: 7,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     mainAxisSpacing: 8,
                     crossAxisSpacing: 8,
-                    children: _journeyDays.map((day) {
+                    children: monthDays.map((day) {
+                      if (day == null) return const SizedBox.shrink();
                       final level = day.score > 0 ? getLevelForScore(day.score) : null;
                       final isAbove = day.score >= 200;
                       return Container(
@@ -175,20 +202,20 @@ class JourneyScreen extends StatelessWidget {
                               : null,
                           color: day.score > 0
                               ? null
-                              : const Color(0xFFC8C3DC).withOpacity(0.15),
+                              : const Color(0xFFDCCDB8).withOpacity(0.15),
                           border: Border.all(
                             color: day.isToday
                                 ? AppColors.lavender
                                 : day.score > 0
                                     ? level!.auraOuter.withOpacity(0.25)
-                                    : const Color(0xFFC8C3DC).withOpacity(0.1),
+                                    : const Color(0xFFDCCDB8).withOpacity(0.1),
                             width: day.isToday ? 2 : 1.5,
                           ),
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('${day.day}',
+                            Text('${day.dayOfMonth}',
                                 style: AppText.sans(
                                     size: 10,
                                     weight: FontWeight.w600,
@@ -198,7 +225,7 @@ class JourneyScreen extends StatelessWidget {
                                   style: TextStyle(
                                       fontSize: 8,
                                       color: isAbove
-                                          ? const Color(0xFFA0DDD1)
+                                          ? const Color(0xFFBBD9A8)
                                           : const Color(0xFFF4C0D0))),
                           ],
                         ),
@@ -208,7 +235,7 @@ class JourneyScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      _legend(const [Color(0xFFA8DDD1), AppColors.lavender], s.journeyCheckedIn, false),
+                      _legend(const [Color(0xFFBBD9A8), AppColors.lavender], s.journeyCheckedIn, false),
                       const SizedBox(width: 16),
                       _legend(null, s.journeyMissed, false),
                       const SizedBox(width: 16),
@@ -230,19 +257,19 @@ class JourneyScreen extends StatelessWidget {
                   const SizedBox(height: 10),
                   ...milestones.map((m) {
                     final dayNum = m[0] as int;
-                    final reached = _completedDays >= dayNum;
+                    final reached = longestStreak >= dayNum;
                     return Container(
                       margin: const EdgeInsets.only(bottom: 12),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: reached
                             ? const Color(0xFFF5EFE0).withOpacity(0.8)
-                            : Colors.white.withOpacity(0.6),
+                            : AppColors.paper.withOpacity(0.6),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: reached
                               ? const Color(0xFFE0CFA8).withOpacity(0.6)
-                              : const Color(0xFFC8C3DC).withOpacity(0.15),
+                              : const Color(0xFFDCCDB8).withOpacity(0.15),
                           width: 1.5,
                         ),
                       ),
@@ -250,7 +277,9 @@ class JourneyScreen extends StatelessWidget {
                         children: [
                           Opacity(
                             opacity: reached ? 1 : 0.3,
-                            child: Text(m[2] as String, style: const TextStyle(fontSize: 28)),
+                            child: Icon(m[2] as IconData,
+                                size: 28,
+                                color: reached ? AppColors.gold : AppColors.muted2),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
@@ -272,7 +301,7 @@ class JourneyScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: reached
                                   ? const Color(0xFFE0CFA8)
-                                  : const Color(0xFFC8C3DC).withOpacity(0.2),
+                                  : const Color(0xFFDCCDB8).withOpacity(0.2),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(reached ? s.journeyDone : 'Day $dayNum',
@@ -303,7 +332,7 @@ class JourneyScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.85),
+        color: AppColors.paper.withOpacity(0.85),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -341,11 +370,11 @@ class JourneyScreen extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: gradient != null ? LinearGradient(colors: gradient) : null,
-            color: gradient == null ? const Color(0xFFC8C3DC).withOpacity(0.2) : null,
+            color: gradient == null ? const Color(0xFFDCCDB8).withOpacity(0.2) : null,
             border: todayBorder
                 ? Border.all(color: AppColors.lavender, width: 2)
                 : (gradient == null
-                    ? Border.all(color: const Color(0xFFC8C3DC).withOpacity(0.4))
+                    ? Border.all(color: const Color(0xFFDCCDB8).withOpacity(0.4))
                     : null),
           ),
         ),

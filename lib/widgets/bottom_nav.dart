@@ -13,11 +13,12 @@ class BottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = context.watch<AppState>().s;
     final tabs = [
-      _Tab(s.navToday, Icons.wb_sunny_outlined, AppColors.lavender, const Color(0xFFE8E4F4)),
-      _Tab(s.navJournal, Icons.menu_book_outlined, AppColors.pink, const Color(0xFFFEF0F5)),
-      _Tab(s.navEnergy, Icons.trending_up, AppColors.teal, const Color(0xFFE6F4F0)),
-      _Tab(s.navJourney, Icons.map_outlined, AppColors.gold, const Color(0xFFF5EFE0)),
-      _Tab(s.navProfile, Icons.person_outline, AppColors.lavender, const Color(0xFFE8E4F4)),
+      _Tab(s.navToday, Icons.wb_sunny_outlined, AppColors.lavender, const Color(0xFFF4E6D2)),
+      _Tab(s.navJournal, Icons.menu_book_outlined, AppColors.pink, const Color(0xFFFBE8DB)),
+      _Tab(s.navEnergy, Icons.trending_up, AppColors.teal, const Color(0xFFEAEFD8)),
+      _Tab(s.navInsights, Icons.insert_chart_outlined, AppColors.gold, const Color(0xFFF5EFE0)),
+      _Tab(s.navJourney, Icons.map_outlined, AppColors.lavender2, const Color(0xFFF4E6D2)),
+      _Tab(s.navProfile, Icons.person_outline, AppColors.lavender, const Color(0xFFF4E6D2)),
     ];
 
     return Container(
@@ -34,36 +35,40 @@ class BottomNav extends StatelessWidget {
         ),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: List.generate(tabs.length, (i) {
           final tab = tabs[i];
           final isActive = activeIndex == i;
-          return GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () => onTap(i),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              decoration: BoxDecoration(
-                color: isActive ? tab.activeBg : Colors.transparent,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(tab.icon,
-                      size: 20,
-                      color: isActive ? tab.activeColor : AppColors.muted2),
-                  const SizedBox(height: 2),
-                  Text(
-                    tab.label,
-                    style: AppText.sans(
-                      size: 11,
-                      weight: isActive ? FontWeight.w600 : FontWeight.w400,
-                      color: isActive ? tab.activeColor : AppColors.muted2,
+          return Expanded(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => onTap(i),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                decoration: BoxDecoration(
+                  color: isActive ? tab.activeBg : Colors.transparent,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(tab.icon,
+                        size: 20,
+                        color: isActive ? tab.activeColor : AppColors.muted2),
+                    const SizedBox(height: 2),
+                    Text(
+                      tab.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: AppText.sans(
+                        size: 10.5,
+                        weight: isActive ? FontWeight.w600 : FontWeight.w400,
+                        color: isActive ? tab.activeColor : AppColors.muted2,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );

@@ -5,8 +5,10 @@ import '../i18n/strings.dart';
 import '../models/check_in.dart';
 import '../models/hawkins.dart';
 import '../state/app_state.dart';
+import '../theme/app_icons.dart';
 import '../theme/app_theme.dart';
 import '../widgets/lang_toggle.dart';
+import '../widgets/paper_background.dart';
 
 class JournalScreen extends StatelessWidget {
   const JournalScreen({super.key});
@@ -59,15 +61,9 @@ class JournalScreen extends StatelessWidget {
           : '${days[dow]}, ${months[d.month - 1]} ${d.day}';
     }
 
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFFFEF0E6), AppColors.canvas],
-          stops: [0, 0.45],
-        ),
-      ),
+    return PaperBackground(
+      tint: const Color(0xFFFEF0E6),
+      blob: AppColors.goldLight,
       child: SafeArea(
         bottom: false,
         child: ListView(
@@ -124,7 +120,7 @@ class JournalScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: isAbove ? const Color(0xFFE6F4F0) : const Color(0xFFF0EDF8),
+                  color: isAbove ? const Color(0xFFEAEFD8) : const Color(0xFFF7ECDB),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text('${s.jsDaily} $dailyEnergy',
@@ -149,7 +145,7 @@ class JournalScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.88),
+        color: AppColors.paper.withOpacity(0.88),
         borderRadius: BorderRadius.circular(24),
         border: Border(left: BorderSide(color: level.auraOuter, width: 3)),
       ),
@@ -165,7 +161,7 @@ class JournalScreen extends StatelessWidget {
               ),
               Text(formatTime(c.time), style: AppText.sans(size: 11, color: AppColors.muted3)),
               const Spacer(),
-              Text(c.emotionEmoji, style: const TextStyle(fontSize: 16)),
+              Icon(AppIcons.emotion(c.emotion), size: 16, color: AppColors.muted),
               const SizedBox(width: 8),
               Container(
                 width: 28,
@@ -186,7 +182,7 @@ class JournalScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: isAbove ? const Color(0xFFE6F4F0) : const Color(0xFFF0EDF8),
+                  color: isAbove ? const Color(0xFFEAEFD8) : const Color(0xFFF7ECDB),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(s.levelName(level.name),
@@ -238,7 +234,7 @@ class JournalScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              const Text('🌿', style: TextStyle(fontSize: 13)),
+              const Icon(Icons.spa_rounded, size: 14, color: AppColors.teal),
               const SizedBox(width: 8),
               Expanded(
                 child: Text.rich(TextSpan(children: [

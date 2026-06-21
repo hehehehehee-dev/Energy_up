@@ -49,6 +49,10 @@ class CheckIn {
 
 const List<String> timeOfDayOrder = ['Morning', 'Afternoon', 'Evening', 'Night'];
 
+/// Format a [DateTime] as the `YYYY-MM-DD` key used throughout check-in data.
+String dateKey(DateTime d) =>
+    '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
 String getTimeOfDay([DateTime? date]) {
   final h = (date ?? DateTime.now()).hour;
   if (h >= 5 && h < 12) return 'Morning';
@@ -85,29 +89,7 @@ class EnergyDay {
   const EnergyDay(this.date, this.score, this.checkIns, this.low, this.high);
 }
 
-const List<EnergyDay> mockEnergyHistory = [
-  EnergyDay('Jun 7', 250, 2, 250, 250),
-  EnergyDay('Jun 8', 303, 3, 100, 500),
-  EnergyDay('Jun 9', 215, 2, 80, 350),
-  EnergyDay('Jun 10', 330, 2, 310, 350),
-  EnergyDay('Jun 11', 180, 2, 110, 250),
-  EnergyDay('Jun 12', 285, 2, 220, 350),
-  EnergyDay('Jun 13', 208, 3, 100, 310),
-];
+const List<EnergyDay> mockEnergyHistory = [];
 
 /// Static demo history shown in the Journal / Energy screens.
-const List<CheckIn> mockHistoryCheckIns = [
-  CheckIn(id: 'h1a', date: '2026-06-12', time: '09:00', timeOfDay: 'Morning', emotion: 'Hope', emotionEmoji: '🌤', score: 220, triggers: ['Work'], reflection: 'Feeling hopeful about the week.'),
-  CheckIn(id: 'h1b', date: '2026-06-12', time: '19:00', timeOfDay: 'Evening', emotion: 'Acceptance', emotionEmoji: '🌸', score: 350, triggers: ['Self & Identity'], reflection: 'Good conversation with my team.'),
-  CheckIn(id: 'h2a', date: '2026-06-11', time: '08:00', timeOfDay: 'Morning', emotion: 'Anxiety', emotionEmoji: '😰', score: 110, triggers: ['Finances', 'Work'], reflection: 'Worried about the upcoming deadline.'),
-  CheckIn(id: 'h2b', date: '2026-06-11', time: '15:00', timeOfDay: 'Afternoon', emotion: 'Neutral', emotionEmoji: '😌', score: 250, triggers: [], reflection: 'Found some calm after a walk.'),
-  CheckIn(id: 'h3a', date: '2026-06-10', time: '07:30', timeOfDay: 'Morning', emotion: 'Willingness', emotionEmoji: '🌿', score: 310, triggers: ['Spirituality'], reflection: 'Morning meditation felt different today.'),
-  CheckIn(id: 'h3b', date: '2026-06-10', time: '21:00', timeOfDay: 'Night', emotion: 'Acceptance', emotionEmoji: '🌸', score: 350, triggers: ['Self & Identity'], reflection: 'Something softened inside.'),
-  CheckIn(id: 'h4a', date: '2026-06-09', time: '10:00', timeOfDay: 'Morning', emotion: 'Grief', emotionEmoji: '😢', score: 80, triggers: ['Relationships'], reflection: 'Missing someone.'),
-  CheckIn(id: 'h4b', date: '2026-06-09', time: '18:00', timeOfDay: 'Evening', emotion: 'Acceptance', emotionEmoji: '🌸', score: 350, triggers: ['Family'], reflection: 'A long talk with my sister helped.'),
-  CheckIn(id: 'h5a', date: '2026-06-08', time: '09:00', timeOfDay: 'Morning', emotion: 'Fear', emotionEmoji: '😨', score: 100, triggers: ['Work'], reflection: 'Anxious start.'),
-  CheckIn(id: 'h5b', date: '2026-06-08', time: '14:00', timeOfDay: 'Afternoon', emotion: 'Willingness', emotionEmoji: '🌿', score: 310, triggers: [], reflection: 'Opened up a bit after lunch.'),
-  CheckIn(id: 'h5c', date: '2026-06-08', time: '20:00', timeOfDay: 'Evening', emotion: 'Love', emotionEmoji: '💗', score: 500, triggers: ['Family'], reflection: 'Spent the afternoon with my grandmother.'),
-  CheckIn(id: 'h6a', date: '2026-06-07', time: '08:00', timeOfDay: 'Morning', emotion: 'Neutral', emotionEmoji: '😌', score: 250, triggers: ['Work'], reflection: 'Quiet day. Just present.'),
-  CheckIn(id: 'h6b', date: '2026-06-07', time: '20:00', timeOfDay: 'Evening', emotion: 'Neutral', emotionEmoji: '😌', score: 250, triggers: [], reflection: 'Gentle evening. Nothing dramatic.'),
-];
+const List<CheckIn> mockHistoryCheckIns = [];

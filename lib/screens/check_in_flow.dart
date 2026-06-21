@@ -5,10 +5,12 @@ import '../i18n/strings.dart';
 import '../models/check_in.dart';
 import '../models/hawkins.dart';
 import '../state/app_state.dart';
+import '../theme/app_icons.dart';
 import '../theme/app_theme.dart';
 import '../widgets/aura_circle.dart';
 import '../widgets/energy_slider.dart';
 import '../widgets/gradient_button.dart';
+import '../widgets/paper_background.dart';
 
 enum _Step { emotion, trigger, journal, practice }
 
@@ -139,15 +141,9 @@ class _EmotionStepState extends State<_EmotionStep> {
       }
     }
 
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFFFEF0F5), AppColors.canvas],
-          stops: [0, 0.5],
-        ),
-      ),
+    return PaperBackground(
+      tint: const Color(0xFFFBE8DB),
+      blob: AppColors.pinkLight,
       child: SafeArea(
         child: Column(
           children: [
@@ -161,7 +157,7 @@ class _EmotionStepState extends State<_EmotionStep> {
                     children: [
                       Text(s.emotionStep.toString().toUpperCase(),
                           style: AppText.sans(
-                              size: 11, color: AppColors.pink, letterSpacing: 1.2)),
+                              size: 11, weight: FontWeight.w700, color: AppColors.pink, letterSpacing: 2)),
                       GestureDetector(
                         onTap: widget.onClose,
                         child: Container(
@@ -193,11 +189,11 @@ class _EmotionStepState extends State<_EmotionStep> {
                   children: [
                     _groupLabel(AppColors.pink, s.emotionBelowLabel),
                     const SizedBox(height: 12),
-                    _grid(low, s, AppColors.pinkLight, const Color(0xFFFEF0F5)),
+                    _grid(low, s, AppColors.pinkLight, const Color(0xFFFBE8DB)),
                     const SizedBox(height: 24),
                     _groupLabel(const Color(0xFF70A898), s.emotionAboveLabel),
                     const SizedBox(height: 12),
-                    _grid(high, s, AppColors.tealSoft, const Color(0xFFE6F4F0)),
+                    _grid(high, s, AppColors.tealSoft, const Color(0xFFEAEFD8)),
                   ],
                 ),
               ),
@@ -207,8 +203,8 @@ class _EmotionStepState extends State<_EmotionStep> {
               child: GradientButton(
                 enabled: _selected != null,
                 colors: _selected != null
-                    ? const [Color(0xFFC47898), Color(0xFFE090B0)]
-                    : const [Color(0xFFEDE8F5), Color(0xFFEDE8F5)],
+                    ? const [Color(0xFFC57E63), Color(0xFFD89478)]
+                    : const [Color(0xFFF4E8D7), Color(0xFFF4E8D7)],
                 onTap: selectedEmotion == null
                     ? null
                     : () => widget.onSelect(selectedEmotion!),
@@ -279,14 +275,16 @@ class _EmotionStepState extends State<_EmotionStep> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(e.emoji, style: const TextStyle(fontSize: 22)),
-                const SizedBox(height: 4),
+                Icon(AppIcons.emotion(e.label),
+                    size: 24,
+                    color: selected ? AppColors.text : AppColors.muted),
+                const SizedBox(height: 6),
                 Text(
                   s.emotionLabel(e.label),
                   textAlign: TextAlign.center,
                   style: AppText.sans(
                     size: 11,
-                    weight: selected ? FontWeight.w600 : FontWeight.w400,
+                    weight: selected ? FontWeight.w700 : FontWeight.w500,
                     color: selected ? AppColors.text : AppColors.muted,
                   ),
                 ),
@@ -327,15 +325,9 @@ class _TriggerStepState extends State<_TriggerStep> {
         .map((tr) => tr.label)
         .toList();
 
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFFFEF0E6), AppColors.canvas],
-          stops: [0, 0.5],
-        ),
-      ),
+    return PaperBackground(
+      tint: const Color(0xFFFEF0E6),
+      blob: AppColors.goldLight,
       child: SafeArea(
         child: Column(
           children: [
@@ -348,13 +340,13 @@ class _TriggerStepState extends State<_TriggerStep> {
                   const SizedBox(height: 12),
                   Text(s.triggerStep.toString().toUpperCase(),
                       style: AppText.sans(
-                          size: 11, color: AppColors.gold, letterSpacing: 1.2)),
+                          size: 11, weight: FontWeight.w700, color: AppColors.gold, letterSpacing: 2)),
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Text(widget.emotion.emoji,
-                          style: const TextStyle(fontSize: 22)),
-                      const SizedBox(width: 8),
+                      Icon(AppIcons.emotion(widget.emotion.label),
+                          size: 24, color: AppColors.gold),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Text(s.triggerTitle,
                             style: AppText.serif(size: 26, color: AppColors.text)),
@@ -393,7 +385,7 @@ class _TriggerStepState extends State<_TriggerStep> {
                         decoration: BoxDecoration(
                           color: selected
                               ? const Color(0xFFF5C4A0).withOpacity(0.3)
-                              : Colors.white.withOpacity(0.8),
+                              : AppColors.paper.withOpacity(0.8),
                           borderRadius: BorderRadius.circular(18),
                           border: Border.all(
                             color: selected
@@ -404,7 +396,9 @@ class _TriggerStepState extends State<_TriggerStep> {
                         ),
                         child: Row(
                           children: [
-                            Text(tr.icon, style: const TextStyle(fontSize: 22)),
+                            Icon(AppIcons.trigger(tr.label),
+                                size: 22,
+                                color: selected ? AppColors.gold : AppColors.muted),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
@@ -490,15 +484,9 @@ class _JournalStepState extends State<_JournalStep> {
   Widget build(BuildContext context) {
     final s = context.watch<AppState>().s;
 
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFFFEF0E6), AppColors.canvas],
-          stops: [0, 0.5],
-        ),
-      ),
+    return PaperBackground(
+      tint: const Color(0xFFFEF0E6),
+      blob: AppColors.goldLight,
       child: SafeArea(
         child: Column(
           children: [
@@ -512,7 +500,7 @@ class _JournalStepState extends State<_JournalStep> {
                     const SizedBox(height: 12),
                     Text(s.journalStep.toString().toUpperCase(),
                         style: AppText.sans(
-                            size: 11, color: AppColors.gold, letterSpacing: 1.2)),
+                            size: 11, weight: FontWeight.w700, color: AppColors.gold, letterSpacing: 2)),
                     const SizedBox(height: 4),
                     Text(s.journalTitle,
                         style: AppText.serif(size: 26, color: AppColors.text)),
@@ -525,7 +513,7 @@ class _JournalStepState extends State<_JournalStep> {
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.85),
+                        color: AppColors.paper.withOpacity(0.85),
                         borderRadius: BorderRadius.circular(24),
                       ),
                       child: Column(
@@ -557,7 +545,7 @@ class _JournalStepState extends State<_JournalStep> {
                                   decoration: BoxDecoration(
                                     color: active
                                         ? l.auraOuter.withOpacity(0.31)
-                                        : const Color(0xFFC8C3DC).withOpacity(0.15),
+                                        : const Color(0xFFDCCDB8).withOpacity(0.15),
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
                                         color: active
@@ -619,7 +607,7 @@ class _JournalStepState extends State<_JournalStep> {
                         hintStyle:
                             AppText.sans(size: 15, color: AppColors.muted2, height: 1.5),
                         filled: true,
-                        fillColor: Colors.white.withOpacity(0.85),
+                        fillColor: AppColors.paper.withOpacity(0.85),
                         contentPadding: const EdgeInsets.all(16),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(18),
@@ -689,15 +677,9 @@ class _PracticeStep extends StatelessWidget {
     final levelName = s.levelName(level.name);
     final practiceName = s.levelPractice(level.practice);
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [level.auraOuter.withOpacity(0.15), AppColors.canvas],
-          stops: const [0, 0.55],
-        ),
-      ),
+    return PaperBackground(
+      tint: Color.alphaBlend(level.auraOuter.withOpacity(0.18), AppColors.canvas),
+      blob: level.auraOuter,
       child: SafeArea(
         child: Column(
           children: [
@@ -716,7 +698,7 @@ class _PracticeStep extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.8),
+                        color: AppColors.paper.withOpacity(0.8),
                         borderRadius: BorderRadius.circular(18),
                       ),
                       child: Column(
@@ -724,8 +706,8 @@ class _PracticeStep extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              Text(emotion.emoji,
-                                  style: const TextStyle(fontSize: 20)),
+                              Icon(AppIcons.emotion(emotion.label),
+                                  size: 20, color: AppColors.textSoft),
                               const SizedBox(width: 8),
                               Text(s.emotionLabel(emotion.label),
                                   style: AppText.sans(
@@ -736,8 +718,8 @@ class _PracticeStep extends StatelessWidget {
                                     horizontal: 10, vertical: 2),
                                 decoration: BoxDecoration(
                                   color: isAbove
-                                      ? const Color(0xFFE6F4F0)
-                                      : const Color(0xFFF0EDF8),
+                                      ? const Color(0xFFEAEFD8)
+                                      : const Color(0xFFF7ECDB),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text('$score',
@@ -796,9 +778,9 @@ class _PracticeStep extends StatelessWidget {
                                   color: level.auraOuter.withOpacity(0.21),
                                   borderRadius: BorderRadius.circular(14),
                                 ),
-                                child: const Center(
-                                    child: Text('🌿',
-                                        style: TextStyle(fontSize: 20))),
+                                child: Center(
+                                    child: Icon(Icons.spa_rounded,
+                                        size: 20, color: level.auraInner)),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
@@ -819,7 +801,7 @@ class _PracticeStep extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.7),
+                        color: AppColors.paper.withOpacity(0.7),
                         borderRadius: BorderRadius.circular(18),
                         border: Border.all(
                             color: AppColors.lavender.withOpacity(0.12)),

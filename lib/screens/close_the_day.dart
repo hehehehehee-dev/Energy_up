@@ -4,10 +4,12 @@ import 'package:provider/provider.dart';
 import '../models/check_in.dart';
 import '../models/hawkins.dart';
 import '../state/app_state.dart';
+import '../theme/app_icons.dart';
 import '../theme/app_theme.dart';
 import '../widgets/aura_circle.dart';
 import '../widgets/energy_slider.dart';
 import '../widgets/gradient_button.dart';
+import '../widgets/paper_background.dart';
 
 class CloseTheDayScreen extends StatefulWidget {
   const CloseTheDayScreen({super.key});
@@ -48,15 +50,9 @@ class _CloseTheDayScreenState extends State<CloseTheDayScreen> {
     final highest = scores.isEmpty ? 0 : scores.reduce((a, b) => a > b ? a : b);
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFFE8E4F4), Color(0xFFF0EDF8), AppColors.canvas],
-            stops: [0, 0.4, 1],
-          ),
-        ),
+      body: PaperBackground(
+        tint: const Color(0xFFF4E6D2),
+        blob: AppColors.lavender2,
         child: SafeArea(
           child: Column(
             children: [
@@ -79,8 +75,8 @@ class _CloseTheDayScreenState extends State<CloseTheDayScreen> {
                       const SizedBox(height: 16),
                       Row(
                         children: [
-                          const Text('🌙', style: TextStyle(fontSize: 22)),
-                          const SizedBox(width: 8),
+                          const Icon(Icons.nightlight_round, size: 24, color: AppColors.lavender),
+                          const SizedBox(width: 10),
                           Text(s.closeTitle,
                               style: AppText.serif(size: 28, color: AppColors.text)),
                         ],
@@ -95,7 +91,7 @@ class _CloseTheDayScreenState extends State<CloseTheDayScreen> {
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.7),
+                            color: AppColors.paper.withOpacity(0.7),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: AppColors.lavender.withOpacity(0.12)),
                           ),
@@ -121,7 +117,7 @@ class _CloseTheDayScreenState extends State<CloseTheDayScreen> {
                                             style: AppText.sans(
                                                 size: 11, color: AppColors.muted2)),
                                       ),
-                                      Text(c.emotionEmoji, style: const TextStyle(fontSize: 14)),
+                                      Icon(AppIcons.emotion(c.emotion), size: 14, color: AppColors.muted),
                                       const SizedBox(width: 8),
                                       Text('${c.score}',
                                           style: AppText.sans(
@@ -160,7 +156,7 @@ class _CloseTheDayScreenState extends State<CloseTheDayScreen> {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.88),
+                          color: AppColors.paper.withOpacity(0.88),
                           borderRadius: BorderRadius.circular(24),
                         ),
                         child: Column(
@@ -210,7 +206,7 @@ class _CloseTheDayScreenState extends State<CloseTheDayScreen> {
                           hintStyle:
                               AppText.sans(size: 15, color: AppColors.muted2, height: 1.5),
                           filled: true,
-                          fillColor: Colors.white.withOpacity(0.85),
+                          fillColor: AppColors.paper.withOpacity(0.85),
                           contentPadding: const EdgeInsets.all(16),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(18),

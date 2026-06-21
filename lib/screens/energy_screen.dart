@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../i18n/strings.dart';
 import '../models/check_in.dart';
 import '../models/hawkins.dart';
 import '../state/app_state.dart';
+import '../theme/app_icons.dart';
 import '../theme/app_theme.dart';
 import '../widgets/energy_chart.dart';
+import '../widgets/energy_funnel.dart';
 import '../widgets/lang_toggle.dart';
+import '../widgets/paper_background.dart';
 
 class EnergyScreen extends StatelessWidget {
   const EnergyScreen({super.key});
@@ -18,17 +22,19 @@ class EnergyScreen extends StatelessWidget {
     final todayCheckIns = app.todayCheckIns;
     final allCheckIns = [...mockHistoryCheckIns, ...todayCheckIns];
 
-    final weekScores = mockEnergyHistory.map((d) => d.score).toList();
-    final weeklyAvg = (weekScores.reduce((a, b) => a + b) / weekScores.length).round();
+    // Use actual check-ins for weekly stats, not mock history
+    final allCheckInsForStats = [...mockHistoryCheckIns, ...todayCheckIns];
+    final allScores = allCheckInsForStats.map((c) => c.score).toList();
+    final weeklyAvg = allScores.isNotEmpty
+        ? (allScores.reduce((a, b) => a + b) / allScores.length).round()
+        : 0;
     final weeklyAvgLevel = getLevelForScore(weeklyAvg);
 
-    final avgCheckIns =
-        (mockEnergyHistory.fold<int>(0, (a, d) => a + d.checkIns) / mockEnergyHistory.length)
-            .toStringAsFixed(1);
-    final avgLow =
-        (mockEnergyHistory.fold<int>(0, (a, d) => a + d.low) / mockEnergyHistory.length).round();
-    final avgHigh =
-        (mockEnergyHistory.fold<int>(0, (a, d) => a + d.high) / mockEnergyHistory.length).round();
+    final avgCheckIns = allScores.isNotEmpty
+        ? (allCheckInsForStats.length / 7).toStringAsFixed(1)
+        : '0.0';
+    final avgLow = allScores.isNotEmpty ? allScores.reduce((a, b) => a < b ? a : b) : 0;
+    final avgHigh = allScores.isNotEmpty ? allScores.reduce((a, b) => a > b ? a : b) : 0;
 
     final emotionCounts = <String, int>{};
     for (final c in allCheckIns) {
@@ -54,25 +60,25 @@ class EnergyScreen extends StatelessWidget {
     }
     final mostCommonTrigger = _topEntry(triggerCounts);
 
-    // Chart data
-    final todayDaily = getDailyEnergy(todayCheckIns);
+    final currentScore = todayCheckIns.isNotEmpty ? todayCheckIns.last.score : null;
+    final todayAvgScore = todayCheckIns.isNotEmpty ? getDailyEnergy(todayCheckIns) : null;
+
+    // Chart data — build from actual check-in history, grouped by day
     final points = <EnergyPoint>[];
-    for (var i = 0; i < mockEnergyHistory.length; i++) {
-      final d = mockEnergyHistory[i];
-      final isLast = i == mockEnergyHistory.length - 1;
-      points.add(EnergyPoint(
-          d.date, isLast && todayCheckIns.isNotEmpty ? todayDaily : d.score));
+    if (allCheckInsForStats.isNotEmpty) {
+      final checkInsByDate = <String, List<CheckIn>>{};
+      for (final c in allCheckInsForStats) {
+        checkInsByDate.putIfAbsent(c.date, () => []).add(c);
+      }
+      for (final date in checkInsByDate.keys.toList()..sort()) {
+        final dailyScore = getDailyEnergy(checkInsByDate[date]!);
+        points.add(EnergyPoint(date, dailyScore));
+      }
     }
 
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFFE6F4F0), AppColors.canvas],
-          stops: [0, 0.45],
-        ),
-      ),
+    return PaperBackground(
+      tint: const Color(0xFFEAEFD8),
+      blob: AppColors.tealSoft,
       child: SafeArea(
         bottom: false,
         child: ListView(
@@ -99,21 +105,46 @@ class EnergyScreen extends StatelessWidget {
               ),
             ),
 
-            // Chart card
+            // Chart card — only show if there's data
+            if (points.isNotEmpty)
+              Container(
+                margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.paper.withOpacity(0.88),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(s.energyChartTitle, style: AppText.sans(size: 12, color: AppColors.muted)),
+                    Text(s.energyChartSub, style: AppText.sans(size: 11, color: AppColors.muted3)),
+                    const SizedBox(height: 12),
+                    EnergyChart(points: points, thresholdLabel: s.energyThreshold),
+                  ],
+                ),
+              ),
+
+            // Map of Consciousness funnel
             Container(
               margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 16, 12, 16),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.88),
+                color: AppColors.paper.withOpacity(0.88),
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(s.energyChartTitle, style: AppText.sans(size: 12, color: AppColors.muted)),
-                  Text(s.energyChartSub, style: AppText.sans(size: 11, color: AppColors.muted3)),
-                  const SizedBox(height: 12),
-                  EnergyChart(points: points, thresholdLabel: s.energyThreshold),
+                  Text(s.lang == Lang.vi ? 'Bản đồ Ý thức' : 'Map of Consciousness',
+                      style: AppText.serif(size: 21, weight: FontWeight.w600, color: AppColors.text)),
+                  Text(
+                      s.lang == Lang.vi
+                          ? 'Thang năng lượng rung động 20–1000'
+                          : 'The vibrational scale of consciousness · 20–1000',
+                      style: AppText.sans(size: 13.5, color: AppColors.muted)),
+                  const SizedBox(height: 16),
+                  EnergyFunnel(s: s, currentScore: currentScore, avgScore: todayAvgScore),
                 ],
               ),
             ),
@@ -134,10 +165,10 @@ class EnergyScreen extends StatelessWidget {
                     crossAxisSpacing: 12,
                     childAspectRatio: 1.55,
                     children: [
-                      _StatCard(value: '$weeklyAvg', sub: s.levelName(weeklyAvgLevel.name), label: s.energyWeeklyAvg, color: AppColors.teal, bg: const Color(0xFFE6F4F0)),
-                      _StatCard(value: '$avgCheckIns${s.energyPerDay}', sub: s.energyGentleConsistency, label: s.energyAvgCheckins, color: AppColors.lavender, bg: const Color(0xFFE8E4F4)),
+                      _StatCard(value: '$weeklyAvg', sub: s.levelName(weeklyAvgLevel.name), label: s.energyWeeklyAvg, color: AppColors.teal, bg: const Color(0xFFEAEFD8)),
+                      _StatCard(value: '$avgCheckIns${s.energyPerDay}', sub: s.energyGentleConsistency, label: s.energyAvgCheckins, color: AppColors.lavender, bg: const Color(0xFFF4E6D2)),
                       _StatCard(value: '$avgLow–$avgHigh', sub: s.energyLowToHigh, label: s.energyDailyRange, color: AppColors.gold, bg: const Color(0xFFF5EFE0)),
-                      _StatCard(value: mostCommonEmotion == null ? '—' : s.emotionLabel(mostCommonEmotion.key), sub: s.energyTimes(mostCommonEmotion?.value ?? 0), label: s.energyCommonEmotion, color: AppColors.pink, bg: const Color(0xFFFEF0F5)),
+                      _StatCard(value: mostCommonEmotion == null ? '—' : s.emotionLabel(mostCommonEmotion.key), sub: s.energyTimes(mostCommonEmotion?.value ?? 0), label: s.energyCommonEmotion, color: AppColors.pink, bg: const Color(0xFFFBE8DB)),
                     ],
                   ),
                 ],
@@ -169,7 +200,7 @@ class EnergyScreen extends StatelessWidget {
                 margin: const EdgeInsets.fromLTRB(20, 8, 20, 16),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.8),
+                  color: AppColors.paper.withOpacity(0.8),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
@@ -206,15 +237,22 @@ class EnergyScreen extends StatelessWidget {
                                 TextSpan(
                                     text: s.tod(c.timeOfDay),
                                     style: AppText.sans(size: 13, weight: FontWeight.w600)),
+                                WidgetSpan(
+                                    alignment: PlaceholderAlignment.middle,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 6, right: 4),
+                                      child: Icon(AppIcons.emotion(c.emotion),
+                                          size: 13, color: AppColors.muted),
+                                    )),
                                 TextSpan(
-                                    text: '  ${c.emotionEmoji} ${s.emotionLabel(c.emotion)}',
+                                    text: s.emotionLabel(c.emotion),
                                     style: AppText.sans(size: 12, color: AppColors.muted)),
                               ])),
                             ),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: isAbove ? const Color(0xFFE6F4F0) : const Color(0xFFF0EDF8),
+                                color: isAbove ? const Color(0xFFEAEFD8) : const Color(0xFFF7ECDB),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(s.levelName(lv.name),
@@ -308,7 +346,7 @@ class _InsightRow extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.75),
+        color: AppColors.paper.withOpacity(0.75),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(

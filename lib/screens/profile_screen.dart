@@ -5,6 +5,7 @@ import '../i18n/strings.dart';
 import '../state/app_state.dart';
 import '../theme/app_theme.dart';
 import '../widgets/lang_toggle.dart';
+import '../widgets/paper_background.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -13,16 +14,11 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final app = context.watch<AppState>();
     final s = app.s;
+    final vi = s.lang == Lang.vi;
 
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFFE8E4F4), AppColors.canvas],
-          stops: [0, 0.4],
-        ),
-      ),
+    return PaperBackground(
+      tint: const Color(0xFFF4E6D2),
+      blob: AppColors.pinkLight,
       child: SafeArea(
         bottom: false,
         child: ListView(
@@ -52,7 +48,7 @@ class ProfileScreen extends StatelessWidget {
                       BoxShadow(color: AppColors.lavender2.withOpacity(0.2), spreadRadius: 4),
                     ],
                   ),
-                  child: const Center(child: Text('🌿', style: TextStyle(fontSize: 36))),
+                  child: const Center(child: Icon(Icons.spa_rounded, size: 36, color: Colors.white)),
                 ),
                 const SizedBox(height: 12),
                 Text(s.profileName, style: AppText.serif(size: 18, color: AppColors.text)),
@@ -73,7 +69,7 @@ class ProfileScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.85),
+                      color: AppColors.paper.withOpacity(0.85),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(
@@ -114,16 +110,58 @@ class ProfileScreen extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   _section(s.profilePracticeSection, [
-                    _Row(Icons.notifications_outlined, s.profileDailyReminder, '8:00 AM', AppColors.lavender),
-                    _Row(Icons.nightlight_round, s.profileEveningReflection, s.profileOff, AppColors.lavender2),
-                    _Row(Icons.menu_book_outlined, s.profileJournalPrompts, s.profileOn, AppColors.tealSoft),
+                    _Row(Icons.notifications_outlined, s.profileDailyReminder, '8:00 AM', AppColors.lavender,
+                        onTap: () => _showProfileSheet(context,
+                            icon: Icons.notifications_outlined,
+                            color: AppColors.lavender,
+                            title: s.profileDailyReminder,
+                            body: vi
+                                ? 'Nhận một lời nhắc nhẹ nhàng mỗi ngày để dừng lại và ghi nhận năng lượng của bạn. Thời gian hiện tại: 8:00 sáng.'
+                                : 'Get a gentle daily nudge to pause and check in with your energy. Current time: 8:00 AM.')),
+                    _Row(Icons.nightlight_round, s.profileEveningReflection, s.profileOff, AppColors.lavender2,
+                        onTap: () => _showProfileSheet(context,
+                            icon: Icons.nightlight_round,
+                            color: AppColors.lavender2,
+                            title: s.profileEveningReflection,
+                            body: vi
+                                ? 'Một lời mời nhẹ nhàng vào cuối ngày để khép lại và chiêm nghiệm những gì đã trải qua. (Hiện đang tắt.)'
+                                : 'A soft end-of-day invitation to close and reflect on your day. (Currently off.)')),
+                    _Row(Icons.menu_book_outlined, s.profileJournalPrompts, s.profileOn, AppColors.tealSoft,
+                        onTap: () => _showProfileSheet(context,
+                            icon: Icons.menu_book_outlined,
+                            color: AppColors.teal,
+                            title: s.profileJournalPrompts,
+                            body: vi
+                                ? 'Hiển thị các câu gợi ý khi bạn viết, giúp việc bắt đầu dễ dàng hơn. (Hiện đang bật.)'
+                                : 'Show prompts while you write to make starting easier. (Currently on.)')),
                   ]),
                   const SizedBox(height: 16),
 
                   _section(s.profileAboutSection, [
-                    _Row(Icons.info_outline, s.profileAboutMap, '', AppColors.lavender),
-                    _Row(Icons.favorite_border, s.profileAcknowledgements, '', AppColors.pinkLight),
-                    _Row(Icons.shield_outlined, s.profilePrivacy, '', AppColors.tealSoft),
+                    _Row(Icons.info_outline, s.profileAboutMap, '', AppColors.lavender,
+                        onTap: () => _showProfileSheet(context,
+                            icon: Icons.info_outline,
+                            color: AppColors.lavender,
+                            title: s.profileAboutMap,
+                            body: vi
+                                ? 'Bản đồ Ý thức là thang đo do Tiến sĩ David Hawkins phát triển (trong cuốn "Power vs. Force"), mô tả mức năng lượng rung động của ý thức con người từ 20 đến 1000. Mốc 200 (Can đảm) là ranh giới giữa các trạng thái co lại và mở rộng. EnergyUp dùng thang đo này như một lăng kính tượng trưng để bạn quan sát đời sống nội tâm — không phải một phép đo khoa học.'
+                                : 'The Map of Consciousness is a scale developed by Dr. David Hawkins (in "Power vs. Force") describing the vibrational energy of human consciousness from 20 to 1000. The 200 mark (Courage) is the boundary between contracting and expanding states. EnergyUp uses it as a symbolic lens for your inner life — not a scientific measurement.')),
+                    _Row(Icons.favorite_border, s.profileAcknowledgements, '', AppColors.pinkLight,
+                        onTap: () => _showProfileSheet(context,
+                            icon: Icons.favorite_border,
+                            color: AppColors.pink,
+                            title: s.profileAcknowledgements,
+                            body: vi
+                                ? 'EnergyUp lấy cảm hứng từ công trình của Tiến sĩ David Hawkins. Được xây dựng bằng Flutter, với lòng biết ơn dành cho tất cả những ai đang chăm sóc đời sống nội tâm của mình. ♡'
+                                : 'EnergyUp is inspired by the work of Dr. David Hawkins. Built with Flutter, with gratitude for everyone tending to their inner life. ♡')),
+                    _Row(Icons.shield_outlined, s.profilePrivacy, '', AppColors.tealSoft,
+                        onTap: () => _showProfileSheet(context,
+                            icon: Icons.shield_outlined,
+                            color: AppColors.teal,
+                            title: s.profilePrivacy,
+                            body: vi
+                                ? 'Toàn bộ ghi nhận và chiêm nghiệm của bạn được lưu ngay trên thiết bị này. EnergyUp không gửi dữ liệu của bạn đến bất kỳ máy chủ nào.'
+                                : 'All your check-ins and reflections are stored on this device. EnergyUp never sends your data to any server.')),
                   ]),
                   const SizedBox(height: 16),
 
@@ -170,7 +208,7 @@ class ProfileScreen extends StatelessWidget {
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.85),
+            color: AppColors.paper.withOpacity(0.85),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
@@ -197,11 +235,15 @@ class _Row extends StatelessWidget {
   final String label;
   final String detail;
   final Color color;
-  const _Row(this.icon, this.label, this.detail, this.color);
+  final VoidCallback? onTap;
+  const _Row(this.icon, this.label, this.detail, this.color, {this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(
         children: [
@@ -224,6 +266,75 @@ class _Row extends StatelessWidget {
           const Icon(Icons.chevron_right, size: 16, color: AppColors.muted3),
         ],
       ),
+    ),
     );
   }
+}
+
+/// Bottom sheet showing details/info for a tapped profile row.
+void _showProfileSheet(
+  BuildContext context, {
+  required IconData icon,
+  required String title,
+  required String body,
+  required Color color,
+}) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    builder: (ctx) => Container(
+      margin: const EdgeInsets.all(12),
+      padding: const EdgeInsets.fromLTRB(22, 16, 22, 28),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFBF4),
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: color.withOpacity(0.18)),
+        boxShadow: [
+          BoxShadow(
+              color: const Color(0xFF7A5A20).withOpacity(0.14),
+              blurRadius: 24,
+              offset: const Offset(0, 10)),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                  color: AppColors.muted3,
+                  borderRadius: BorderRadius.circular(2)),
+            ),
+          ),
+          const SizedBox(height: 18),
+          Row(
+            children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.16),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: color.withOpacity(0.4), width: 1.4),
+                ),
+                child: Icon(icon, color: color, size: 22),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(title,
+                    style: AppText.serif(size: 21, color: AppColors.text)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(body,
+              style: AppText.sans(size: 15, color: AppColors.textSoft, height: 1.7)),
+        ],
+      ),
+    ),
+  );
 }

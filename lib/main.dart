@@ -39,7 +39,7 @@ class AngelApp extends StatelessWidget {
     final onboarded = context.select<AppState, bool>((a) => a.onboarded);
 
     return MaterialApp(
-      title: 'Angel',
+      title: 'EnergyUp',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,

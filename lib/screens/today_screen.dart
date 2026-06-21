@@ -5,10 +5,12 @@ import '../i18n/strings.dart';
 import '../models/check_in.dart';
 import '../models/hawkins.dart';
 import '../state/app_state.dart';
+import '../theme/app_icons.dart';
 import '../theme/app_theme.dart';
 import '../widgets/aura_circle.dart';
 import '../widgets/gradient_button.dart';
 import '../widgets/lang_toggle.dart';
+import '../widgets/paper_background.dart';
 
 class TodayScreen extends StatelessWidget {
   final VoidCallback onStartCheckIn;
@@ -55,15 +57,9 @@ class TodayScreen extends StatelessWidget {
     final dailyEnergy = getDailyEnergy(checkIns);
     final isAbove = currentScore >= 200;
 
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFFF0EDF8), AppColors.canvas],
-          stops: [0, 0.4],
-        ),
-      ),
+    return PaperBackground(
+      tint: const Color(0xFFF7ECDB),
+      blob: AppColors.tealSoft,
       child: SafeArea(
         bottom: false,
         child: ListView(
@@ -108,7 +104,7 @@ class TodayScreen extends StatelessWidget {
                         ),
                       ),
                       child: const Center(
-                          child: Text('🌿', style: TextStyle(fontSize: 18))),
+                          child: Icon(Icons.spa_rounded, size: 20, color: Colors.white)),
                     ),
                   ),
                 ],
@@ -131,7 +127,7 @@ class TodayScreen extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.85),
+        color: AppColors.paper.withOpacity(0.85),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(color: AppColors.lavender.withOpacity(0.12), blurRadius: 32),
@@ -192,7 +188,7 @@ class TodayScreen extends StatelessWidget {
         margin: const EdgeInsets.fromLTRB(20, 0, 20, 12),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.88),
+          color: AppColors.paper.withOpacity(0.88),
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(color: AppColors.lavender.withOpacity(0.12), blurRadius: 32),
@@ -335,7 +331,7 @@ class TodayScreen extends StatelessWidget {
           margin: const EdgeInsets.fromLTRB(20, 0, 20, 12),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.8),
+            color: AppColors.paper.withOpacity(0.8),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
@@ -350,12 +346,21 @@ class TodayScreen extends StatelessWidget {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   for (var i = 0; i < sorted.length; i++) ...[
-                    Text(
-                      '${sorted[i].emotionEmoji} ${s.levelName(getLevelForScore(sorted[i].score).name)}',
-                      style: AppText.sans(
-                          size: 13,
-                          weight: FontWeight.w500,
-                          color: getLevelForScore(sorted[i].score).auraInner),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(AppIcons.emotion(sorted[i].emotion),
+                            size: 14,
+                            color: getLevelForScore(sorted[i].score).auraInner),
+                        const SizedBox(width: 4),
+                        Text(
+                          s.levelName(getLevelForScore(sorted[i].score).name),
+                          style: AppText.sans(
+                              size: 13,
+                              weight: FontWeight.w500,
+                              color: getLevelForScore(sorted[i].score).auraInner),
+                        ),
+                      ],
                     ),
                     if (i < sorted.length - 1)
                       const Icon(Icons.arrow_forward, size: 12, color: AppColors.muted3),
@@ -378,7 +383,7 @@ class TodayScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [dailyLevel.auraOuter.withOpacity(0.09), Colors.white.withOpacity(0.9)],
+                colors: [dailyLevel.auraOuter.withOpacity(0.09), AppColors.paper.withOpacity(0.9)],
               ),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: dailyLevel.auraOuter.withOpacity(0.19)),
@@ -485,7 +490,7 @@ class TodayScreen extends StatelessWidget {
                   shape: BoxShape.circle,
                   border: Border.all(color: lv.auraOuter, width: 1.5),
                 ),
-                child: Center(child: Text(c.emotionEmoji, style: const TextStyle(fontSize: 10))),
+                child: Center(child: Icon(AppIcons.emotion(c.emotion), size: 12, color: lv.auraInner)),
               ),
               if (!isLast)
                 Expanded(
@@ -566,7 +571,7 @@ class TodayScreen extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
-            childAspectRatio: 2.5,
+            childAspectRatio: 2.2,
             children: moments.map((m) {
               final done = checkIns.any((c) => c.timeOfDay == m[0]);
               return GestureDetector(
@@ -576,7 +581,7 @@ class TodayScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: done
                         ? AppColors.tealSoft.withOpacity(0.15)
-                        : Colors.white.withOpacity(0.7),
+                        : AppColors.paper.withOpacity(0.7),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: done

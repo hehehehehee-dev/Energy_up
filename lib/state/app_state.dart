@@ -14,7 +14,7 @@ class AppState extends ChangeNotifier {
 
   SharedPreferences? _prefs;
 
-  Lang _lang = Lang.en;
+  Lang _lang = Lang.vi; // Vietnamese is the default; users can switch to English
   bool _onboarded = false;
   final List<CheckIn> _checkIns = [];
   // date (YYYY-MM-DD) -> end-of-day reflection text
@@ -27,12 +27,52 @@ class AppState extends ChangeNotifier {
   /// All user check-ins, most recent first by date+time.
   List<CheckIn> get checkIns => List.unmodifiable(_checkIns);
 
-  String get _today => _dateKey(DateTime.now());
+  String get _today => dateKey(DateTime.now());
 
   /// Check-ins recorded today.
   List<CheckIn> get todayCheckIns =>
       _checkIns.where((c) => c.date == _today).toList()
         ..sort((a, b) => a.time.compareTo(b.time));
+
+  /// Check-ins recorded on a given `YYYY-MM-DD` date.
+  List<CheckIn> checkInsOn(String date) =>
+      _checkIns.where((c) => c.date == date).toList()
+        ..sort((a, b) => a.time.compareTo(b.time));
+
+  Set<String> get _checkInDates => _checkIns.map((c) => c.date).toSet();
+
+  /// Days checked in in a row, counting back from today. If today has no
+  /// check-in yet, the streak still counts through yesterday so an
+  /// in-progress streak doesn't look broken before the day ends.
+  int get currentStreak {
+    final dates = _checkInDates;
+    if (dates.isEmpty) return 0;
+    var cursor = DateTime.now();
+    if (!dates.contains(dateKey(cursor))) {
+      cursor = cursor.subtract(const Duration(days: 1));
+    }
+    var streak = 0;
+    while (dates.contains(dateKey(cursor))) {
+      streak++;
+      cursor = cursor.subtract(const Duration(days: 1));
+    }
+    return streak;
+  }
+
+  /// Longest streak ever reached — kept so milestones stay unlocked even
+  /// after the current streak resets.
+  int get longestStreak {
+    final dates = _checkInDates.toList()..sort();
+    if (dates.isEmpty) return 0;
+    var longest = 1;
+    var current = 1;
+    for (var i = 1; i < dates.length; i++) {
+      final gap = DateTime.parse(dates[i]).difference(DateTime.parse(dates[i - 1])).inDays;
+      current = gap == 1 ? current + 1 : 1;
+      if (current > longest) longest = current;
+    }
+    return longest;
+  }
 
   Map<String, String> get dailyReflections => Map.unmodifiable(_dailyReflections);
 
@@ -41,7 +81,8 @@ class AppState extends ChangeNotifier {
     final prefs = _prefs!;
 
     _onboarded = prefs.getBool(_kOnboarded) ?? false;
-    _lang = (prefs.getString(_kLang) == 'vi') ? Lang.vi : Lang.en;
+    // Default to Vietnamese; only switch to English if the user explicitly chose it.
+    _lang = (prefs.getString(_kLang) == 'en') ? Lang.en : Lang.vi;
 
     final raw = prefs.getString(_kCheckIns);
     if (raw != null) {
@@ -96,6 +137,4 @@ class AppState extends ChangeNotifier {
     );
   }
 
-  static String _dateKey(DateTime d) =>
-      '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 }

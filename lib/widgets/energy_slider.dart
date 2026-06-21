@@ -32,7 +32,7 @@ class EnergySlider extends StatelessWidget {
                   Container(
                     height: 8,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFC8C3DC).withOpacity(0.3),
+                      color: const Color(0xFFDCCDB8).withOpacity(0.3),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),

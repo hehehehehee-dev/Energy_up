@@ -6,7 +6,7 @@ class Strings {
   final Lang lang;
 
   // Nav
-  final String navToday, navJournal, navEnergy, navJourney, navProfile;
+  final String navToday, navJournal, navEnergy, navInsights, navJourney, navProfile;
 
   // Greeting
   final String greetingMorning, greetingAfternoon, greetingEvening, greetingNight, greetingSub;
@@ -65,7 +65,7 @@ class Strings {
   final String Function(int) jsCheckInsCount;
 
   // Journey screen
-  final String journeyLabel, journeyTitle, journeySub, journeyDayStreak, journeyCheckins, journeyProgress, journeyYour21;
+  final String journeyLabel, journeyTitle, journeySub, journeyDayStreak, journeyCheckins, journeyProgress;
   final String journeyCheckedIn, journeyMissed, journeyToday, journeyMilestones;
   final String journeyFirstWeek, journeyTwoWeeks, journeyTwentyOne, journeyConsecutiveCheckins, journeyDone;
 
@@ -89,6 +89,7 @@ class Strings {
     required this.navToday,
     required this.navJournal,
     required this.navEnergy,
+    required this.navInsights,
     required this.navJourney,
     required this.navProfile,
     required this.greetingMorning,
@@ -219,7 +220,6 @@ class Strings {
     required this.journeyDayStreak,
     required this.journeyCheckins,
     required this.journeyProgress,
-    required this.journeyYour21,
     required this.journeyCheckedIn,
     required this.journeyMissed,
     required this.journeyToday,
@@ -265,7 +265,7 @@ class Strings {
 
 final Strings enStrings = Strings(
   lang: Lang.en,
-  navToday: 'Today', navJournal: 'Journal', navEnergy: 'Energy', navJourney: 'Journey', navProfile: 'Profile',
+  navToday: 'Today', navJournal: 'Journal', navEnergy: 'Energy', navInsights: 'Insights', navJourney: 'Journey', navProfile: 'Profile',
   greetingMorning: 'Good morning', greetingAfternoon: 'Good afternoon',
   greetingEvening: 'Good evening', greetingNight: 'Good night',
   greetingSub: 'How has your energy moved today?',
@@ -276,7 +276,7 @@ final Strings enStrings = Strings(
   onbContinue: 'Continue', onbBegin: 'Begin my journey',
   onbDisclaimerBadge: 'A gentle reminder',
   onbDisclaimerTitle: 'This is a reflection tool, not a diagnosis',
-  onbD1: 'Angel is a self-reflection and journaling practice — not a medical or clinical tool.',
+  onbD1: 'EnergyUp is a self-reflection and journaling practice — not a medical or clinical tool.',
   onbD2: 'If you are experiencing serious emotional distress, please speak with a qualified mental health professional.',
   onbD3: 'The energy scores in this app are symbolic — they represent your inner experience, not any physical measurement.',
   onbD4: 'There is no right or wrong answer. This space is entirely yours.',
@@ -389,12 +389,11 @@ final Strings enStrings = Strings(
   jsDaily: 'Daily:', jsPracticeLabel: 'Practice:',
   jsCheckInsCount: (n) => '$n check-in${n != 1 ? 's' : ''}',
   journeyLabel: 'Your journey',
-  journeyTitle: '21-Day Practice',
+  journeyTitle: 'Monthly Check-in',
   journeySub: 'Consistency is how awareness deepens. Each check-in is a small act of self-love.',
   journeyDayStreak: 'day streak',
   journeyCheckins: 'check-ins',
   journeyProgress: 'Progress',
-  journeyYour21: 'Your 21 days',
   journeyCheckedIn: 'Checked in', journeyMissed: 'Missed', journeyToday: 'Today',
   journeyMilestones: 'Milestones',
   journeyFirstWeek: 'First week', journeyTwoWeeks: 'Two weeks', journeyTwentyOne: '21 days',
@@ -405,12 +404,12 @@ final Strings enStrings = Strings(
   profileSince: 'Journaling since June 2026',
   profilePracticeSection: 'Practice',
   profileDailyReminder: 'Daily reminder', profileEveningReflection: 'Evening reflection', profileJournalPrompts: 'Journal prompts',
-  profileAboutSection: 'About Angel',
+  profileAboutSection: 'About EnergyUp',
   profileAboutMap: 'About the Map of Consciousness', profileAcknowledgements: 'Acknowledgements', profilePrivacy: 'Privacy & data',
   profileLanguage: 'Language',
   profileDisclaimerTitle: 'Disclaimer',
-  profileDisclaimerBody: "Angel is a self-reflection and journaling tool inspired by Dr. David Hawkins' Map of Consciousness (Power vs. Force). The energy scores in this app are symbolic representations of subjective inner states — they are not medical measurements, clinical assessments, or diagnostics of any kind. If you are experiencing serious emotional distress, please reach out to a qualified mental health professional.",
-  profileVersion: 'Angel v1.0 · Made with ♡ for your inner life',
+  profileDisclaimerBody: "EnergyUp is a self-reflection and journaling tool inspired by Dr. David Hawkins' Map of Consciousness (Power vs. Force). The energy scores in this app are symbolic representations of subjective inner states — they are not medical measurements, clinical assessments, or diagnostics of any kind. If you are experiencing serious emotional distress, please reach out to a qualified mental health professional.",
+  profileVersion: 'EnergyUp v1.0 · Made with ♡ for your inner life',
   profileOn: 'On', profileOff: 'Off',
   levelNames: {
     'Shame': 'Shame', 'Guilt': 'Guilt', 'Apathy': 'Apathy', 'Grief': 'Grief',
@@ -467,7 +466,7 @@ final Strings enStrings = Strings(
 
 final Strings viStrings = Strings(
   lang: Lang.vi,
-  navToday: 'Hôm nay', navJournal: 'Nhật ký', navEnergy: 'Năng lượng', navJourney: 'Hành trình', navProfile: 'Hồ sơ',
+  navToday: 'Hôm nay', navJournal: 'Nhật ký', navEnergy: 'Năng lượng', navInsights: 'Xu hướng', navJourney: 'Hành trình', navProfile: 'Hồ sơ',
   greetingMorning: 'Chào buổi sáng', greetingAfternoon: 'Chào buổi chiều',
   greetingEvening: 'Chào buổi tối', greetingNight: 'Chào buổi đêm',
   greetingSub: 'Năng lượng của bạn đã thay đổi như thế nào hôm nay?',
@@ -478,16 +477,16 @@ final Strings viStrings = Strings(
   onbContinue: 'Tiếp tục', onbBegin: 'Bắt đầu hành trình của tôi',
   onbDisclaimerBadge: 'Nhắc nhở nhẹ nhàng',
   onbDisclaimerTitle: 'Đây là công cụ tự chiêm nghiệm, không phải chẩn đoán',
-  onbD1: 'Angel là một thực hành tự chiêm nghiệm và viết nhật ký — không phải công cụ y tế hay lâm sàng.',
+  onbD1: 'EnergyUp là một thực hành tự chiêm nghiệm và viết nhật ký — không phải công cụ y tế hay lâm sàng.',
   onbD2: 'Nếu bạn đang trải qua đau khổ cảm xúc nghiêm trọng, hãy tìm đến chuyên gia sức khỏe tâm thần có chuyên môn.',
   onbD3: 'Điểm năng lượng trong ứng dụng này mang tính biểu tượng — chúng phản ánh trải nghiệm nội tâm của bạn, không phải đo lường vật lý.',
   onbD4: 'Không có câu trả lời đúng hay sai. Không gian này hoàn toàn là của bạn.',
   onbScaleBadge: 'Bản đồ Ý thức',
-  onbScaleTitle: 'Thang Năng lượng',
+  onbScaleTitle: 'Thang năng lượng',
   onbScaleSub: 'Lấy cảm hứng từ công trình của Tiến sĩ David Hawkins. Điểm số từ 20 đến 1000.',
-  onbScaleEnlightenment: 'Giác ngộ', onbScaleLove: 'Tình yêu & Bình yên',
-  onbScaleCourage: 'Can đảm & Phát triển', onbScaleBelow: 'Dưới ngưỡng',
-  onbScaleNote: '200 là ngưỡng ranh giới — ranh giới giữa co lại và mở rộng. Điểm trên 200 là những trạng thái khẳng định cuộc sống. Dưới 200, năng lượng co lại hơn. Cả hai đều là những trải nghiệm con người hợp lệ.',
+  onbScaleEnlightenment: 'Giác ngộ', onbScaleLove: 'Tình yêu & bình yên',
+  onbScaleCourage: 'Can đảm & phát triển', onbScaleBelow: 'Dưới ngưỡng',
+  onbScaleNote: '200 là ngưỡng then chốt — ranh giới giữa co lại và mở rộng. Điểm từ 200 trở lên là những trạng thái khẳng định cuộc sống. Dưới 200, năng lượng có xu hướng co lại. Cả hai đều là những trải nghiệm bình thường của con người.',
   todayEmptyTitle: 'Bắt đầu ghi nhận đầu tiên',
   todayEmptyBody: 'Năng lượng của bạn như thế nào ngay lúc này? Không có câu trả lời đúng — chỉ cần trung thực với bản thân.',
   todayCheckInNow: 'Ghi nhận ngay',
@@ -520,7 +519,7 @@ final Strings viStrings = Strings(
   emotionTitle: 'Bạn đang cảm thấy thế nào?',
   emotionBody: 'Chọn cảm xúc gần nhất với trải nghiệm hiện tại của bạn. Không có câu trả lời sai.',
   emotionBelowLabel: 'Dưới 200 — trạng thái co lại',
-  emotionAboveLabel: '200 và trên — trạng thái mở rộng',
+  emotionAboveLabel: 'Từ 200 trở lên — trạng thái mở rộng',
   emotionSelectPrompt: 'Chọn một cảm xúc',
   emotionContinueWith: (e) => 'Tiếp tục với $e',
   emotionLabels: {
@@ -537,7 +536,7 @@ final Strings viStrings = Strings(
   triggerContinueWith: (n) => 'Tiếp tục · Đã chọn $n',
   triggerLabels: {
     'Relationships': 'Các mối quan hệ', 'Work': 'Công việc', 'Health': 'Sức khỏe',
-    'Finances': 'Tài chính', 'Family': 'Gia đình', 'Self & Identity': 'Bản thân & Danh tính',
+    'Finances': 'Tài chính', 'Family': 'Gia đình', 'Self & Identity': 'Bản thân & danh tính',
     'Spirituality': 'Tâm linh', 'Creativity': 'Sáng tạo',
     'Environment': 'Môi trường', 'Not sure': 'Không chắc',
   },
@@ -591,12 +590,11 @@ final Strings viStrings = Strings(
   jsDaily: 'Ngày:', jsPracticeLabel: 'Bài tập:',
   jsCheckInsCount: (n) => '$n lần ghi nhận',
   journeyLabel: 'Hành trình của bạn',
-  journeyTitle: 'Thực hành 21 ngày',
+  journeyTitle: 'Ghi Nhận Theo Tháng',
   journeySub: 'Kiên trì là cách nhận thức sâu sắc hơn. Mỗi lần ghi nhận là một hành động yêu thương bản thân.',
   journeyDayStreak: 'ngày liên tiếp',
   journeyCheckins: 'lần ghi nhận',
   journeyProgress: 'Tiến trình',
-  journeyYour21: '21 ngày của bạn',
   journeyCheckedIn: 'Đã ghi nhận', journeyMissed: 'Bỏ qua', journeyToday: 'Hôm nay',
   journeyMilestones: 'Mốc quan trọng',
   journeyFirstWeek: 'Tuần đầu tiên', journeyTwoWeeks: 'Hai tuần', journeyTwentyOne: '21 ngày',
@@ -607,12 +605,12 @@ final Strings viStrings = Strings(
   profileSince: 'Nhật ký từ tháng 6 năm 2026',
   profilePracticeSection: 'Thực hành',
   profileDailyReminder: 'Nhắc nhở hàng ngày', profileEveningReflection: 'Chiêm nghiệm buổi tối', profileJournalPrompts: 'Gợi ý nhật ký',
-  profileAboutSection: 'Về Angel',
+  profileAboutSection: 'Về EnergyUp',
   profileAboutMap: 'Về Bản đồ Ý thức', profileAcknowledgements: 'Lời cảm ơn', profilePrivacy: 'Quyền riêng tư & dữ liệu',
   profileLanguage: 'Ngôn ngữ',
   profileDisclaimerTitle: 'Tuyên bố miễn trách',
-  profileDisclaimerBody: 'Angel là công cụ tự chiêm nghiệm và viết nhật ký lấy cảm hứng từ Bản đồ Ý thức của Tiến sĩ David Hawkins (Power vs. Force). Điểm năng lượng trong ứng dụng này là biểu tượng cho trạng thái chủ quan bên trong — không phải đo lường y tế, đánh giá lâm sàng hay chẩn đoán bất kỳ. Nếu bạn đang trải qua đau khổ cảm xúc nghiêm trọng, hãy liên hệ chuyên gia sức khỏe tâm thần có chuyên môn.',
-  profileVersion: 'Angel v1.0 · Được tạo ra với ♡ cho đời sống nội tâm của bạn',
+  profileDisclaimerBody: 'EnergyUp là công cụ tự chiêm nghiệm và viết nhật ký lấy cảm hứng từ Bản đồ Ý thức của Tiến sĩ David Hawkins (Power vs. Force). Điểm năng lượng trong ứng dụng này là biểu tượng cho trạng thái chủ quan bên trong — không phải đo lường y tế, đánh giá lâm sàng hay chẩn đoán bất kỳ. Nếu bạn đang trải qua đau khổ cảm xúc nghiêm trọng, hãy liên hệ chuyên gia sức khỏe tâm thần có chuyên môn.',
+  profileVersion: 'EnergyUp v1.0 · Được tạo ra với ♡ cho đời sống nội tâm của bạn',
   profileOn: 'Bật', profileOff: 'Tắt',
   levelNames: {
     'Shame': 'Hổ thẹn', 'Guilt': 'Tội lỗi', 'Apathy': 'Thờ ơ', 'Grief': 'Đau buồn',
